@@ -9,16 +9,16 @@
       <a href="" title="Início" accesskey="1"> Início</a>
     </li>
     <li class="coworkers">
-      <a href="admin_cliente_listagem.php" title="clientes" accesskey="4"> Clientes</a>
+      <a href="{{ route('clientes.index') }}" title="clientes" accesskey="4"> Clientes</a>
     </li>
     <li class="checkin_out">
-      <a href="admin_checkinout_listagem.php" title="Check-In/Out" accesskey="2"> Check-In/Out</a>
+      <a href="{{ route('check.index') }}" title="Check-In/Out" accesskey="2"> Check-In/Out</a>
     </li>
     <li class="reserva_salas">
       <a href="" title="Reservar Salas" accesskey="3"> Reserva de Salas</a>
     </li>
     <li class="impressoes">
-      <a href="" title="Impressões" accesskey="4"> Impressões</a>
+      <a href="#" title="Impressões" accesskey="4"> Impressões</a>
     </li>
     <li class="ocultar">
       <a href="" title="Mensagens" class="icone-email" accesskey="4"> Mensagens</a>
@@ -44,7 +44,7 @@
       <a href="" title="Minha Conta" class="icone-configuracao" accesskey="5"><span>Minha Conta</span></a>
     </li>
     <li>
-      <a href="" title="Sair" class="icone-ligar-desligar" accesskey="6"><span>Sair</span></a>
+      <a href="{{ route('auth.logout') }}" title="Sair" class="icone-ligar-desligar" accesskey="6"><span>Sair</span></a>
     </li>
   </ul>
 </nav>

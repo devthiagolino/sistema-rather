@@ -16,7 +16,6 @@ class AlterTableUsuarios extends Migration
         {
             $table->string('foto')->nullable();
             $table->boolean('ativo')->nullable();
-            $table->date('data_cadastro');
         });
     }
 
@@ -29,7 +28,7 @@ class AlterTableUsuarios extends Migration
     {
         Schema::table('users', function (Blueprint $table) 
         {
-            $table->dropColumn(['foto','ativo', 'data_cadastro']);
+            $table->dropColumn(['foto','ativo']);
         });
     }
 }

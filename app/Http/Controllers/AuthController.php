@@ -46,7 +46,7 @@ class AuthController extends Controller
 
 		if (Auth::attempt($data, $request->get('remember', false))) 
 		{
-			return redirect()->intended('dashboard');
+			return redirect()->route('dashboard');
 		}
 
 		return redirect()->back()->with('error', 'Não foi possível lhe autenticar no sistema.');
