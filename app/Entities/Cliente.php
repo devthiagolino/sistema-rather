@@ -2,49 +2,70 @@
 
 namespace App\Entities;
 use App\Entities\Plano;
+use App\Entities\ClientePJ;
+use App\Entities\ClientePF;
 
 class Cliente extends AbstractModel
 {
 	public $table = 'clientes';
 
+	public function getListaClientes($qtd = 10)
+	{
+		return $this
+		->select([
+			'clientes.*',
+			'planos.titulo as plano'
+		])
+		->join('planos', 'clientes.plano_id', '=', 'planos.id')
+		->orderBy('clientes.created_at', 'desc')
+		->paginate($qtd);
+	}
+
 	public function tipoPF()
 	{
-		return $this->belongsTo(ClienteTipoPF::class, 'tipo_cliente_id');
+		return $this->hasOne(ClientePF::class, 'cliente_id');
 	}
 
 	public function tipoPJ()
 	{
-		return $this->belongsTo(ClienteTipoPJ::class, 'tipo_cliente_id');
+		return $this->hasOne(ClientePJ::class, 'cliente_id');
 	}
 
 	public function getCliente()
 	{
-		swicth($this->tipo_cliente_id)
+		
+		$tipo = $this->getTipoCliente();
+
+		switch ($tipo)
 		{
-			case 1:
-			return $this->tipoPF;
-			break;
-			case 2:
-			return $this->tipoPJ;
-			break;
+			case 'PF':
+				return $this->tipoPF;
+				break;
+			case 'PJ':
+				return $this->tipoPJ;
+				break;
 			default:
-			return null;
+				return null;
+				break;
 		}
+
 	}
 
 	public function getTipoCliente()
 	{
-		swicth($this->tipo_cliente_id)
+
+		if($this->tipoPF)
 		{
-			case 1:
-				return 'PF';
-				break;
-			case 2:
-				return 'PJ';
-				break;
-			default:
-				return null;
+			return 'PF';
 		}
+
+		if($this->tipoPJ)
+		{
+			return 'PJ';
+		}
+
+		return null;
+
 	}
 
 	public function getPlano()

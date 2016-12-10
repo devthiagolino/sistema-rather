@@ -61,6 +61,16 @@ Route::group(['middleware' => 'auth:admin', 'prefix' => '/admin'], function()
 {
 
 	Route::get('/', 'Admin\HomeController@home')->name('admin.dashboard');	
+
+	Route::group(['prefix' => 'clientes', 'namespace' => 'Admin'], function()
+	{
+		
+		Route::get('/', 'ClientesController@index')->name('admin.clientes.index');
+		Route::get('/create', 'ClientesController@create')->name('admin.clientes.create');
+		Route::get('/{id}/edit', 'ClientesController@edit')->name('admin.clientes.edit');
+		Route::delete('/{id}', 'ClientesController@destroy')->name('admin.clientes.delete');
+
+	});
 	
 
 });

@@ -6,13 +6,13 @@
 <nav id="menu">
   <ul>
     <li class="inicio ativo">
-      <a href="" title="Início" accesskey="1"> Início</a>
+      <a href="{{ route('admin.dashboard') }}" title="Início" accesskey="1"> Início</a>
     </li>
     <li class="coworkers">
-      <a href="{{ route('web.clientes.index') }}" title="clientes" accesskey="4"> Clientes</a>
+      <a href="{{ route('admin.clientes.index') }}" title="clientes" accesskey="4"> Clientes</a>
     </li>
     <li class="checkin_out">
-      <a href="{{ route('web.check.index') }}" title="Check-In/Out" accesskey="2"> Check-In/Out</a>
+      <a href="" title="Check-In/Out" accesskey="2"> Check-In/Out</a>
     </li>
     <li class="reserva_salas">
       <a href="" title="Reservar Salas" accesskey="3"> Reserva de Salas</a>
