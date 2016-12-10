@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Carbon\Carbon;
 
 class User extends Authenticatable
 {
@@ -23,4 +24,13 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    static public function getAniversariantesDoDia($qtd = 3)
+    {
+        return self::whereBetween('dt_nascimento', 
+            [
+                Carbon::now(),  //begin
+                Carbon::now()->subMonth() //end
+            ])->take($qtd)->get();
+    }
 }
