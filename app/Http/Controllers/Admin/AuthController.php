@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\User;
 use Auth, Validator;
+use App\Http\Controllers\Controller;
 
 class AuthController extends Controller
 {
@@ -18,13 +19,13 @@ class AuthController extends Controller
 
 	public function login()
 	{
-		return view('auth.login');
+		return view('admin.auth.login');
 	}
 
 	public function logout()
 	{
-		Auth::guard('web')->logout();
-		return redirect()->route('web.auth.login');
+		Auth::guard('admin')->logout();
+		return redirect()->route('admin.auth.login');
 	}
 
 	public function authenticate(Request $request)
@@ -33,20 +34,20 @@ class AuthController extends Controller
 		$validator = Validator::make($request->all(), [
 			'email' => 'required',
 			'password' => 'required',
-			]);
+		]);
 
 		if ($validator->fails()) {
-			return redirect()
-			->back()
-			->withErrors($validator)
-			->withInput();
-		}
+            return redirect()
+            			->back()
+                        ->withErrors($validator)
+                        ->withInput();
+        }
 
 		$data = $request->only(['email', 'password']);
 
-		if (Auth::guard('web')->attempt($data, $request->get('remember', false))) 
+		if (Auth::guard('admin')->attempt($data, $request->get('remember', false))) 
 		{
-			return redirect()->route('web.dashboard');
+			return redirect()->route('admin.dashboard');
 		}
 
 		return redirect()->back()->with('error', 'Não foi possível lhe autenticar no sistema.');

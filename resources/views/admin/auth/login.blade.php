@@ -2,7 +2,7 @@
 
 @section('content')
 
-<form action="{{ route('web.auth.authenticate') }}" method="post" class="formulario-login">
+<form action="{{ route('admin.auth.authenticate') }}" method="post" class="formulario-login">
 	{!! csrf_field() !!}
 	<div class="row">
 		<div class="col-md-offset-4 col-md-4">
