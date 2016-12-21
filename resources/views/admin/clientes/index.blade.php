@@ -11,7 +11,6 @@
 	<!-- === BOTOES OPCOES === -->
 	<div class="btn-group pull-right">
 		<a href="{{ route('admin.clientes.create') }}" class="btn btn-default">Novo Cliente</a>
-		<a href="{{ route('admin.clientes.index') }}" class="btn btn-default">Ver Todos</a>
 	</div>
 	<!-- fim BOTOES OPCOES -->
 
@@ -166,10 +165,10 @@
 				</td>
 				<td>
 					<a href="{{ route('admin.clientes.edit', [$cliente->id]) }}" title="Editar" class="icone-editar"><span>Editar</span></a>
-					<form method="post" action="{{ route('admin.clientes.delete', [$cliente->id]) }}">
+					<form method="post" action="{{ route('admin.clientes.delete', [$cliente->id]) }}" class="form-remover">
 						{!! csrf_field() !!}
 						<input type="hidden" name="_method" value="delete">
-						<button class="icone-excluir"><span>Excluir</span></</button>
+						<button class="icone-excluir" type="submit"><span>Excluir</span></</button>
 					</form>
 				</td>
 			</tr>

@@ -99,6 +99,11 @@
 			<input type="text" class="form-control" id="empresa_telefone" placeholder="(00) 0000-0000" name="telefone">
 		</div>
 
+		<div class="form-group">
+			<label for="telefone_movel">Celular<em>*</em></label>
+			<input type="text" class="form-control" id="telefone_movel" placeholder="(00) 00000-0000" name="celular">
+		</div>
+
 		<div class="form-group input_file">
 			<label for="foto">Logo</label>
 			<input type="file" id="foto" name="foto">

@@ -4,7 +4,8 @@ var APP = {
 	{
 		this.TiposDeCliente();
 		this.UfCidadesBR();
-		this.CriarCliente();	
+		this.CriarCliente();
+		this.confirmarParaRemoverCliente();
 	},
 
 	TiposDeCliente: function()
@@ -131,6 +132,85 @@ var APP = {
 		var html    = template(contexto);
 
 		return html;
+	},
+
+	confirmarParaRemoverCliente: function()
+	{
+		var form = $('.form-remover');
+
+		$('.icone-excluir').on('click', function(e)
+		{
+			e.preventDefault();
+
+			var options = {
+				dataType:  'json', 
+				beforeSubmit: function()
+				{
+				//				
+			},
+			success: function(response)
+			{
+
+				if(response.sucesso)
+				{
+					swal(
+					{
+						title: "Sucesso!",
+						type: 'success',
+						text: response.sucesso,
+						timer: 3000,
+						showConfirmButton: true
+					}, function()
+					{
+						if(response.redirect)
+						{
+							window.location = response.redirect;	
+						}
+					});
+				}
+
+			},
+			error: function(data)
+			{
+				var json = $.parseJSON(data.responseText);
+
+				swal({
+					title: "Desculpe!",
+					text: json.erro,
+					type: "warning",
+					showCancelButton: true,
+					confirmButtonColor: "#DD6B55",
+					confirmButtonText: "Yes, delete it!",
+					closeOnConfirm: false
+				});
+			}
+		};
+
+		swal(
+		{
+			title: "Atenção",
+			text: "Você tem certeza que deseja remover esse registro?",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "Sim, remover!",
+			cancelButtonText: "Não, cancelar.",
+			closeOnConfirm: false,
+			closeOnCancel: false,
+			showLoaderOnConfirm: true,
+		}, function(isConfirm)
+		{
+			if (!isConfirm) 
+			{
+				swal("Cancelado", "Operação cancelada pelo usuário.", "error");
+				return false;
+			}
+
+			form.ajaxSubmit(options);
+			return false;
+		});
+
+	});
 	}
 
 };

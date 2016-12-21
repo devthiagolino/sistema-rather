@@ -15,6 +15,8 @@ class ClientePF extends AbstractModel
 	    "genero"
     ];
 
+    public $dates = ['data_nascimento'];
+
     public function getTitulo()
     {
     	return 'Pessoa Física';

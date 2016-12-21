@@ -48,14 +48,14 @@ class ClientesController extends Controller
 
 		$validator = Validator::make($request->all(), [
 			'tipo_cliente' => 'required'
-		]);
+			]);
 
 		if($validator->fails()) 
 		{
-            return response()->json($validator->errors(), 422);
-        }
+			return response()->json($validator->errors(), 422);
+		}
 
-        $validator = null;
+		$validator = null;
 
 		$tipoDeCliente = $request->get('tipo_cliente');
 
@@ -68,22 +68,22 @@ class ClientesController extends Controller
 
 		if($validator->fails()) 
 		{
-            return response()->json($validator->errors(), 422);
-        }
+			return response()->json($validator->errors(), 422);
+		}
 
 		$clienteData = [
-			'plano_id' 			=> $request->get('plano'),
-			'vinculado_a' 		=> $request->get('vinculo_id', 0),
-			'email' 			=> $request->get('email'),
-			'telefone' 			=> Utils::unmask($request->get('telefone', null)),
-			'celular' 			=> Utils::unmask($request->get('celular')),
-			'observacoes' 		=> $request->get('observacoes', null),
-			'cep'				=> Utils::unmask($request->get('cep', null)),
-			'endereco' 			=> $request->get('endereco', null),
-			'end_numero' 		=> $request->get('numero', null),
-			'end_complemento' 	=> $request->get('end_complemento', null),
-			'bairro' 			=> $request->get('bairro', null),
-			'ativo' 			=> $request->get('ativo', 1)
+		'plano_id' 			=> $request->get('plano'),
+		'vinculado_a' 		=> $request->get('vinculo_id', 0),
+		'email' 			=> $request->get('email'),
+		'telefone' 			=> Utils::unmask($request->get('telefone', null)),
+		'celular' 			=> Utils::unmask($request->get('celular')),
+		'observacoes' 		=> $request->get('observacoes', null),
+		'cep'				=> Utils::unmask($request->get('cep', null)),
+		'endereco' 			=> $request->get('endereco', null),
+		'end_numero' 		=> $request->get('numero', null),
+		'end_complemento' 	=> $request->get('end_complemento', null),
+		'bairro' 			=> $request->get('bairro', null),
+		'ativo' 			=> $request->get('ativo', 1)
 		];
 
 		if($request->hasFile('foto'))
@@ -113,28 +113,31 @@ class ClientesController extends Controller
 		}
 
 		$tipoClienteData = [
-			'pf' => [
-				'nome' => $request->get('nome'),
-				'nome_apresentacao_nick' => $request->get('nome_apresentacao_nick', null),
-				'cpf' => Utils::unmask($request->get('cpf')),
-				'rg' => Utils::unmask($request->get('rg', null)),
-				'genero' => $request->get('genero')
-			],
-			'pj' => [
-				'razao_social' => $request->get('razao_social'),
-				'nome_fantasia' => $request->get('nome_fantasia'),
-				'ramo_atividade' => $request->get('ramo_atividade', null),
-				'cnpj' => Utils::unmask($request->get('cnpj')),
-				'atividades_iniciadas_em' => $request->get('atividades_iniciadas_em', null),
-				'nome_representante_legal' => $request->get('nome_representante_legal', null)
-			]
+		'pf' => [
+		'nome' => $request->get('nome'),
+		'nome_apresentacao_nick' => $request->get('nome_apresentacao_nick', null),
+		'cpf' => Utils::unmask($request->get('cpf')),
+		'rg' => Utils::unmask($request->get('rg', null)),
+		'genero' => $request->get('genero')
+		],
+		'pj' => [
+		'razao_social' => $request->get('razao_social'),
+		'nome_fantasia' => $request->get('nome_fantasia'),
+		'ramo_atividade' => $request->get('ramo_atividade', null),
+		'cnpj' => Utils::unmask($request->get('cnpj')),
+		'atividades_iniciadas_em' => $request->get('atividades_iniciadas_em', \Carbon\Carbon::now()->format('Y-m-d')),
+		'nome_representante_legal' => $request->get('nome_representante_legal', null)
+		]
 		];
 		
-		$dataNascimento = \Carbon\Carbon::createFromFormat('d/m/Y', $request->get('data_nascimento'));
-
-		if($dataNascimento)
+		if($request->has('data_nascimento'))
 		{
-			$tipoClienteData[$tipoDeCliente]['data_nascimento'] = $dataNascimento->format('Y-m-d');
+			$dataNascimento = \Carbon\Carbon::createFromFormat('d/m/Y', $request->get('data_nascimento'));
+
+			if($dataNascimento)
+			{
+				$tipoClienteData[$tipoDeCliente]['data_nascimento'] = $dataNascimento->format('Y-m-d');
+			}
 		}
 
 		if(!isset($tipoClienteData[$tipoDeCliente]))
@@ -169,12 +172,30 @@ class ClientesController extends Controller
 		return response()->json([
 			'redirect' => route('admin.clientes.index'), 
 			'sucesso' => 'Cliente cadastrado com sucesso.'
-		]);
+			]);
 
 	}
 
 	public function edit($id)
-	{}
+	{
+		$cliente = Cliente::find($id);
+
+		if(!$cliente)
+		{
+			return abort(404);
+		}
+
+		$planos 	= Plano::getPlanosAtivos();
+		$vinculosPF 	= Cliente::getVinculos();
+		$vinculosPJ 	= Cliente::getVinculos('pj');
+
+		return view('admin.clientes.edit', compact('cliente', 'planos', 'vinculosPJ', 'vinculosPF'));
+	}
+
+	public function update($id)
+	{
+		
+	}
 
 	public function destroy($id)
 	{
@@ -183,11 +204,27 @@ class ClientesController extends Controller
 
 		if($cliente)
 		{
-			$cliente->delete();
-			return redirect()->back()->with('sucesso', 'Registro removido com sucesso!');
+			try{
+				
+				$cliente->delete();
+				return response()->json([
+					'sucesso' => 'Registro removido com sucesso!',
+					'redirect' => route('admin.clientes.index')
+					], 200);
+
+			}catch(\Exception $e){
+				
+				if(env('APP_DEBUG'))
+				{
+					return response()->json(['erro' => $e->getMessage()], 500);
+				}else{
+					return response()->json(['erro' => 'Não foi possível remover esse cliente, por favor entrar em contato com o suporte. :)'], 500);
+				}
+
+			}
 		}
 
-		return redirect()->back()->with('erro', 'Registro não pôde ser removido!');
+		return response()->json(['erro' => 'Cliente não existe!'], 422);
 
 	}
 

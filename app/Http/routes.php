@@ -69,6 +69,7 @@ Route::group(['middleware' => 'auth:admin', 'prefix' => '/admin'], function()
 		
 		Route::get('/', 'ClientesController@index')->name('admin.clientes.index');
 		Route::post('/', 'ClientesController@store')->name('admin.clientes.store');
+		Route::put('/{id}', 'ClientesController@update')->name('admin.clientes.update');
 		Route::get('/create', 'ClientesController@create')->name('admin.clientes.create');
 		Route::get('/{id}/edit', 'ClientesController@edit')->name('admin.clientes.edit');
 		Route::delete('/{id}', 'ClientesController@destroy')->name('admin.clientes.delete');
