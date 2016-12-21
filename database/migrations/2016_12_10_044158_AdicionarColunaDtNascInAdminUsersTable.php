@@ -12,7 +12,7 @@ class AdicionarColunaDtNascInAdminUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('admin_users', function (Blueprint $table) 
+        Schema::create('admin_users', function (Blueprint $table) 
         {
             $table->date('dt_nascimento')->after('email');
         });

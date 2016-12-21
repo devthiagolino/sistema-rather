@@ -17,6 +17,12 @@ class AlterTableUsuarios extends Migration
             $table->string('foto')->nullable();
             $table->boolean('ativo')->nullable();
         });
+
+        Schema::table('admin_users', function (Blueprint $table) 
+        {
+            $table->string('foto')->nullable();
+            $table->boolean('ativo')->nullable();
+        });
     }
 
     /**
@@ -27,6 +33,11 @@ class AlterTableUsuarios extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) 
+        {
+            $table->dropColumn(['foto','ativo']);
+        });
+
+        Schema::table('admin_users', function (Blueprint $table) 
         {
             $table->dropColumn(['foto','ativo']);
         });

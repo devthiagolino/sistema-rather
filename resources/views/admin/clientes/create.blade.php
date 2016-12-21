@@ -8,7 +8,6 @@
 
 	<!-- === BOTOES OPCOES === -->
 	<div class="btn-group pull-right">
-		<a href="{{ route('admin.clientes.create') }}" class="btn btn-default">Novo Cliente</a>
 		<a href="{{ route('admin.clientes.index')}}" class="btn btn-default">Ver Todos</a>
 	</div>
 	<!-- fim BOTOES OPCOES -->
@@ -19,149 +18,76 @@
 
 
 <!-- === FORMULARIO === -->
-<form>
+<form action="{{ route('admin.clientes.store') }}" enctype="multipart/form-data" method="post" id="cadastrar-cliente">
+
+	@if (count($errors) > 0)
+	    <div class="alert alert-danger">
+	        <ul>
+	            @foreach ($errors->all() as $error)
+	                <li>{{ $error }}</li>
+	            @endforeach
+	        </ul>
+	    </div>
+	@endif
+
+	@if(session()->has('erro'))
+		<div class="alert alert-danger">
+			<p>{{ session()->get('erro') }}</p>
+		</div>
+	@endif
+
+	<div class="output"></div>
+
+	{!! csrf_field() !!}
 
 	<h2>Tipo do Cliente</h2>
 
 	<div class="form-inline">
 		<div class="form-group">
 			<!-- <label for="tipo_cliente">Tipo do Cliente<em>*</em></label> -->
-			<select class="form-control selectpicker" id="tipo_cliente">
-				<option value="PF">Pessoa Física</option>
-				<option value="PJ">Pessoa Jurídica</option>
+			<select class="form-control selectpicker" id="tipo_cliente" name="tipo_cliente">
+				<option value="">Selecione</option>
+				<option value="pf">Pessoa Física</option>
+				<option value="pj">Pessoa Jurídica</option>
 			</select>
 		</div>
 	</div>
 
-
-
-	<h2>Dados da Empresa</h2>
-
-	<div class="form-inline">
-		<div class="form-group">
-			<label for="razao_social">Razão Social<em>*</em></label>
-			<input type="text" class="form-control" id="razao_social" placeholder="Razão Social">
-		</div>
-		<div class="form-group">
-			<label for="nome_fantasia">Nome Fantasia<em>*</em></label>
-			<input type="text" class="form-control" id="nome_fantasia" placeholder="Nome Fantasia">
-		</div>
-		<div class="form-group">
-			<label for="cnpj">CNPJ<em>*</em></label>
-			<input type="text" class="form-control" id="cnpj" placeholder="00.000.000/0000-00">
-		</div>
-		<div class="form-group">
-			<label for="email">E-mail<em>*</em></label>
-			<input type="email" class="form-control" id="email" placeholder="E-mail">
-		</div>
-		<div class="form-group">
-			<label for="empresa_telefone">Telefone</label>
-			<input type="text" class="form-control" id="empresa_telefone" placeholder="(00) 0000-0000">
-		</div>
-		<div class="form-group input_file">
-			<label for="foto">Logo</label>
-			<input type="file" id="foto">
-			<!-- <p class="help-block">Selecione uma foto do cliente</p> -->
-		</div>
-		<div class="form-group textarea">
-			<label for="observacoes">Observações Sobre a Empresa</label>
-			<textarea class="form-control" rows="3" id="observacoes"></textarea>
-		</div>
-	</div>
-
-
-
-	<h2>Dados Pessoais</h2>
-
-	<div class="form-inline">
-		<div class="form-group">
-			<label for="nome">Nome<em>*</em></label>
-			<input type="text" class="form-control" id="nome" placeholder="Nome Completo">
-		</div>
-		<div class="form-group">
-			<label for="apelido">Nome para o sistema<em>*</em></label>
-			<input type="text" class="form-control" id="apelido" placeholder="Nome e Sobrenome">
-		</div>
-		<div class="form-group">
-			<label for="email">E-mail<em>*</em></label>
-			<input type="email" class="form-control" id="email" placeholder="E-mail">
-		</div>
-		<div class="form-group">
-			<label for="data_nascimento">Data Nascimento<em>*</em></label>
-			<input type="text" class="form-control" id="data_nascimento" placeholder="00/00/0000">
-		</div>
-		<div class="form-group">
-			<label for="cpf">CPF<em>*</em></label>
-			<input type="text" class="form-control" id="cpf" placeholder="000.000.000-00">
-		</div>
-		<div class="form-group">
-			<label for="rg">RG</label>
-			<input type="text" class="form-control" id="rg" placeholder="">
-		</div>
-		<div class="form-group">
-			<label for="sexo">Sexo<em>*</em></label>
-			<select class="form-control selectpicker" id="sexo" title="- Selecione -">
-				<option>Masculino</option>
-				<option>Feminino</option>
-			</select>
-		</div>
-		<div class="form-group">
-			<label for="telefone_movel">Celular<em>*</em></label>
-			<input type="text" class="form-control" id="telefone_movel" placeholder="(00) 00000-0000">
-		</div>
-		<div class="form-group">
-			<label for="telefone">Telefone</label>
-			<input type="text" class="form-control" id="telefone" placeholder="(00) 0000-0000">
-		</div>
-		<div class="form-group input_file">
-			<label for="foto">Foto</label>
-			<input type="file" id="foto">
-			<!-- <p class="help-block">Selecione uma foto do cliente</p> -->
-		</div>
-		<div class="form-group textarea">
-			<label for="observacoes">Observações Sobre o Cliente</label>
-			<textarea class="form-control" rows="3" id="observacoes"></textarea>
-		</div>
-	</div>
-
-
+	<!-- alterna conforme o tipo de cliente selecionado -->
+	<div class="envolve-tipo-de-cliente"></div>
 
 	<h2>Endereço</h2>
 
 	<div class="form-inline">
 		<div class="form-group">
 			<label for="cep">CEP<em>*</em></label>
-			<input type="text" class="form-control" id="cep" placeholder="00000-000">
+			<input type="text" class="form-control" id="cep" placeholder="00000-000" name="cep">
 		</div>
 		<div class="form-group">
 			<label for="endereco">Endereço<em>*</em></label>
-			<input type="text" class="form-control" id="endereco" placeholder="Rua / Avenida / Rodovia">
+			<input type="text" class="form-control" id="endereco" placeholder="Rua / Avenida / Rodovia" name="endereco">
 		</div>
 		<div class="form-group">
 			<label for="numero">Nº<em>*</em></label>
-			<input type="text" class="form-control" id="numero" placeholder="Número do Imóvel">
+			<input type="text" class="form-control" id="numero" placeholder="Número do Imóvel" name="end_numero">
 		</div>
 		<div class="form-group">
 			<label for="complemento">Complemento</label>
-			<input type="text" class="form-control" id="complemento" placeholder="">
+			<input type="text" class="form-control" id="complemento" placeholder="" name="end_complemento">
 		</div>
 		<div class="form-group">
 			<label for="bairro">Bairro<em>*</em></label>
-			<input type="text" class="form-control" id="bairro" placeholder="">
+			<input type="text" class="form-control" id="bairro" placeholder="" name="bairro">
 		</div>
 		<div class="form-group">
 			<label for="uf">UF<em>*</em></label>
-			<select id="uf" class="form-control selectpicker" data-show-subtext="true" data-live-search="true" title="- Selecione -">
-				<option>Acre</option>
-				<option>Alagoas</option>
+			<select id="uf" class="form-control selectpicker" data-show-subtext="true" data-live-search="true" title="- Selecione -" name="uf">				
 			</select>
 		</div>
 		<div class="form-group">
 			<label for="cidade">Cidade<em>*</em></label>
-			<select id="cidade" class="form-control selectpicker" data-show-subtext="true" data-live-search="true" title="- Selecione -">
-				<option>Atalaia</option>
-				<option>Coruripe</option>
-				<option>Maceió</option>
+			<select id="cidade" class="form-control selectpicker" data-show-subtext="true" data-live-search="true" title="- Selecione -" name="cidade">
+				<option>Selecione</option>
 			</select>
 		</div>
 	</div>
@@ -173,57 +99,57 @@
 	<div class="form-inline">
 		<div class="form-group">
 			<label for="cliente_vinculado">Vinculado a<em>*</em></label>
-			<select class="form-control selectpicker" id="cliente_vinculado">
+			<select class="form-control selectpicker" id="cliente_vinculado" name="vinculo_id">
 				<option value="" selected="">Não possui vínculo</option>
 				<optgroup label="Empresas">
-					<option value="doity">Doity</option>
-					<option value="ema">Ema</option>
-					<option value="locadados">Locadados</option>
-					<option value="maceio_ordinario">Maceió Ordinário</option>
-					<option value="umdois">UmDois</option>
-					<option value="yooh">Yooh</option>
+					@if(count($vinculosPJ))
+						@foreach($vinculosPJ as $id => $vinculo)
+							<option value="{{$id}}">{{$vinculo}}</option>
+						@endforeach
+					@endif	
 				</optgroup>
 				<optgroup label="Pessoas">
-					<option value="Aulus Raffael">Aulus Raffael</option>
-					<option value="Edivan Barbosa">Edivan Barbosa</option>
-					<option value="Jamerson Ramalho">Jamerson Ramalho</option>
+					@if(count($vinculosPF))
+						@foreach($vinculosPF as $id => $vinculo)
+							<option value="{{$id}}">{{$vinculo}}</option>
+						@endforeach
+					@endif	
 				</optgroup>
 			</select>
 		</div>
 		<div class="form-group">
 			<label for="plano">Plano<em>*</em></label>
-			<select name="plano" class="selectpicker" multiple data-show-subtext="true" data-live-search="true" title="- Selecione -">
+			<select name="plano" class="selectpicker" data-show-subtext="true" data-live-search="true" title="- Selecione -">
 				<option>Estação de Trabalho</option>
-				<option>Sala Privativa (3 pessoas)</option>
-				<option>Sala Privativa (4 pessoas)</option>
-				<option>Sala Privativa (7 pessoas)</option>
-				<option>Sala Privativa (9 pessoas)</option>
-				<option>Sala de Reunião</option>
-				<option>Sala de Treinamento</option>
+				@if(count($planos))
+					@foreach($planos as $id => $plano)
+						<option value="{{$id}}">{{$plano}}</option>
+					@endforeach
+				@endif				
 			</select>
 		</div>
 		<div class="form-group">
 			<label for="responsavel">É o Responsável?<em>*</em></label>
-			<select class="form-control selectpicker" id="responsavel">
+			<select class="form-control selectpicker" id="responsavel" name="responsavel">
 				<option selected="selected">Não</option>
 				<option>Sim</option>
 			</select>
 		</div>
 		<div class="form-group">
 			<label for="qtde_horas_sala_reuniao">+ Sala de Reunião (h)</label>
-			<input type="text" class="form-control" id="qtde_horas_sala_reuniao" placeholder="Apenas números">
+			<input type="text" class="form-control" id="qtde_horas_sala_reuniao" placeholder="Apenas números" name="qtd_hr_reuniao">
 		</div>
 		<div class="form-group">
 			<label for="qtde_horas_sala_treinamento">+ Sala de Treinamento (h)</label>
-			<input type="text" class="form-control" id="qtde_horas_sala_treinamento" placeholder="Apenas números">
+			<input type="text" class="form-control" id="qtde_horas_sala_treinamento" placeholder="Apenas números" name="qtd_hr_treinamento">
 		</div>
 		<div class="form-group">
 			<label for="numero_impressoes">Impressões Adicionais</label>
-			<input type="text" class="form-control" id="numero_impressoes" placeholder="Apenas números">
+			<input type="text" class="form-control" id="numero_impressoes" placeholder="Apenas números" name="qtd_impressoes">
 		</div>
 		<div class="form-group">
 			<label for="dia_pagamento">Dia de pagamento<em>*</em></label>
-			<select class="form-control selectpicker" id="dia_pagamento" title="- Selecione -">
+			<select class="form-control selectpicker" id="dia_pagamento" title="- Selecione -" name="dia_pagamento">
 				<option>01</option>
 				<option>02</option>
 				<option>03</option>
@@ -260,7 +186,7 @@
 		<div class="form-group">
 			<div class="checkbox ativar">
 				<label>
-					<input type="checkbox"> Ativo?
+					<input type="checkbox" name="ativo" value="1"> Ativo?
 				</label>
 			</div>
 		</div>

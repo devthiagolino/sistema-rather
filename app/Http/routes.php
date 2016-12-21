@@ -7,6 +7,8 @@ Route::group(['prefix' => 'admin'], function()
 	Route::get('/logout', 'Admin\AuthController@logout')->name('admin.auth.logout');
 	Route::post('/login', 'Admin\AuthController@authenticate')->name('admin.auth.authenticate');
 
+
+
 });
 
 
@@ -66,10 +68,19 @@ Route::group(['middleware' => 'auth:admin', 'prefix' => '/admin'], function()
 	{
 		
 		Route::get('/', 'ClientesController@index')->name('admin.clientes.index');
+		Route::post('/', 'ClientesController@store')->name('admin.clientes.store');
 		Route::get('/create', 'ClientesController@create')->name('admin.clientes.create');
 		Route::get('/{id}/edit', 'ClientesController@edit')->name('admin.clientes.edit');
 		Route::delete('/{id}', 'ClientesController@destroy')->name('admin.clientes.delete');
 
+	});
+
+	Route::get('/ufs/', function($uf = null){
+    	return response()->json(\Artesaos\Cidade::select('uf')->distinct('uf')->orderBy('uf')->get());
+	});
+
+	Route::get('/cidades/{uf?}', function($uf = null){
+	    return response()->json(\Artesaos\Cidade::where('uf', $uf)->orderBy('nome')->get());
 	});
 	
 

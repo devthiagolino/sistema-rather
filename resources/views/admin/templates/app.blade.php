@@ -115,5 +115,9 @@ $(function()
 });
 </script>
   
+
+  <!-- esqueletos do handlebars -->
+  @include('admin.handlebars.templates')
+
 </body>
 </html>

@@ -7,7 +7,10 @@
     "require": {
         "php": ">=5.5.9",
         "laravel/framework": "5.2.*",
-        "artesaos/cidadesbr": "^1.0"
+        "artesaos/cidadesbr": "^1.0",
+        "kyslik/column-sortable": "~5.0",
+        "tucker-eric/eloquentfilter": "^1.0",
+        "jansenfelipe/utils": "^2.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

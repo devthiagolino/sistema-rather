@@ -30,7 +30,6 @@
 <!-- fim TITULO SECAO -->
 
 
-
 <!-- === BOTOES OPCOES === -->
 <div class="botoes_opcoes btn-group">
 	<button type="button" class="btn btn-danger icone-excluir"> Excluir</button>

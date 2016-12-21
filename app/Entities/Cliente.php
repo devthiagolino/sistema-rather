@@ -5,20 +5,69 @@ use App\Entities\Plano;
 use App\Entities\ClientePJ;
 use App\Entities\ClientePF;
 
+use EloquentFilter\Filterable;
+use Kyslik\ColumnSortable\Sortable;
+
 class Cliente extends AbstractModel
 {
+
+	use Sortable, Filterable;
+
+	public $sortable = 
+	[
+		'ativo'
+	];
+
+	public static $rulesPF = [
+		'nome' 		=> 'required',
+		'nome_apresentacao_nick' 	=> 'required',
+		'email' 	=> 'required|email',
+		'data_nascimento' => 'required',
+		'cpf' 	=> 'required',
+		'genero' 	=> 'required|in:M,F,O',
+		'celular' => 'required'
+	];
+
+	public static $rulesPJ = [
+		'razao_social' 	=> 'required',
+		'nome_fantasia'	=> 'required',
+		'cnpj' 	=> 'required',
+		'email' => 'required|email',
+		'celular' => 'required'
+	];
+
 	public $table = 'clientes';
 
-	public function getListaClientes($qtd = 10)
+	public $fillable = [
+		'plano_id', 
+		'vinculado_a', 
+		'email', 
+		'telefone',
+		'celular', 	
+		'observacoes', 
+		'cep',
+		'endereco',
+		'end_numero', 
+		'end_complemento', 
+		'bairro', 
+		'ativo'
+	];
+
+	public function modelFilter()
+	{
+		return $this->provideFilter(\App\ModelFilters\ClienteFilter::class);
+	}
+
+	public function getListaClientes()
 	{
 		return $this
-		->select([
+		->select(
+			[
 			'clientes.*',
 			'planos.titulo as plano'
-		])
+			])
 		->join('planos', 'clientes.plano_id', '=', 'planos.id')
-		->orderBy('clientes.created_at', 'desc')
-		->paginate($qtd);
+		->orderBy('clientes.created_at', 'desc');
 	}
 
 	public function tipoPF()
@@ -39,16 +88,47 @@ class Cliente extends AbstractModel
 		switch ($tipo)
 		{
 			case 'PF':
-				return $this->tipoPF;
-				break;
+			return $this->tipoPF;
+			break;
 			case 'PJ':
-				return $this->tipoPJ;
-				break;
+			return $this->tipoPJ;
+			break;
 			default:
-				return null;
-				break;
+			return null;
+			break;
 		}
 
+	}
+
+	public static function getVinculos($tipo = 'pf')
+	{
+		
+		$tiposPermitidos = ['pf', 'pj'];
+		if(!in_array($tipo, $tiposPermitidos))
+		{
+			return [];
+		}
+
+		$orderBy = [
+		'pj' => 'clientes_pj.razao_social', 
+		'pf' => 'clientes_pf.nome'
+		];
+
+		$lists = [
+		'pj' => [
+		'clientes_pj.razao_social',
+		'clientes_pj.id'
+		], 
+		'pf' => [
+		'clientes_pf.nome',
+		'clientes_pf.id'
+		]
+		];
+
+		return self::where('clientes.ativo', 1)
+		->join("clientes_{$tipo}", 'clientes.id', '=', "clientes_{$tipo}.cliente_id")
+		->orderBy($orderBy[$tipo], 'asc')
+		->lists($lists[$tipo][0], $lists[$tipo][1]);
 	}
 
 	public function getTipoCliente()
