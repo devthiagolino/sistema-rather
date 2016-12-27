@@ -20,6 +20,8 @@
 <!-- === FORMULARIO === -->
 <form action="{{ route('admin.clientes.update', [$cliente->id]) }}" enctype="multipart/form-data" method="post" id="cadastrar-cliente">
 
+<input type="hidden" name="_method" value="put">
+
 	@if (count($errors) > 0)
 	    <div class="alert alert-danger">
 	        <ul>
@@ -45,7 +47,7 @@
 	<div class="form-inline">
 		<div class="form-group">
 			<!-- <label for="tipo_cliente">Tipo do Cliente<em>*</em></label> -->
-			<select class="form-control selectpicker" id="tipo_cliente" name="tipo_cliente">
+			<select class="form-control selectpicker" id="tipo_cliente" name="tipo_cliente" data-acao="editar">
 				<option value="">Selecione</option>
 				<option value="pf" {{ $cliente->getTipoCliente() == 'PF' ? 'selected' : '' }}>Pessoa Física</option>
 				<option value="pj" {{ $cliente->getTipoCliente() == 'PJ' ? 'selected' : '' }}>Pessoa Jurídica</option>
@@ -87,12 +89,12 @@
 		</div>
 		<div class="form-group">
 			<label for="uf">UF<em>*</em></label>
-			<select id="uf" class="form-control selectpicker" data-show-subtext="true" data-live-search="true" title="- Selecione -" name="uf">				
+			<select id="uf" class="form-control selectpicker" data-show-subtext="true" data-live-search="true" title="- Selecione -" name="uf" default="{{$cliente->cidade->uf}}">				
 			</select>
 		</div>
 		<div class="form-group">
 			<label for="cidade">Cidade<em>*</em></label>
-			<select id="cidade" class="form-control selectpicker" data-show-subtext="true" data-live-search="true" title="- Selecione -" name="cidade">
+			<select id="cidade" class="form-control selectpicker" data-show-subtext="true" data-live-search="true" title="- Selecione -" name="cidade_id" default="{{ $cliente->cidade->id }}">
 				<option>Selecione</option>
 			</select>
 		</div>
@@ -143,56 +145,30 @@
 		</div>
 		<div class="form-group">
 			<label for="qtde_horas_sala_reuniao">+ Sala de Reunião (h)</label>
-			<input type="text" class="form-control" id="qtde_horas_sala_reuniao" placeholder="Apenas números" name="qtd_hr_reuniao">
+			<input type="text" class="form-control" id="qtde_horas_sala_reuniao" placeholder="Apenas números" name="hr_sala_reuniao" value="{{$cliente->hr_sala_reuniao}}">
 		</div>
 		<div class="form-group">
 			<label for="qtde_horas_sala_treinamento">+ Sala de Treinamento (h)</label>
-			<input type="text" class="form-control" id="qtde_horas_sala_treinamento" placeholder="Apenas números" name="qtd_hr_treinamento">
+			<input type="text" class="form-control" id="qtde_horas_sala_treinamento" placeholder="Apenas números" name="hr_sala_treinamento" value="{{$cliente->hr_sala_treinamento}}">
 		</div>
 		<div class="form-group">
 			<label for="numero_impressoes">Impressões Adicionais</label>
-			<input type="text" class="form-control" id="numero_impressoes" placeholder="Apenas números" name="qtd_impressoes">
+			<input type="text" class="form-control" id="numero_impressoes" placeholder="Apenas números" name="impressoes_adicionais" value="{{$cliente->impressoes_adicionais}}">
 		</div>
 		<div class="form-group">
 			<label for="dia_pagamento">Dia de pagamento<em>*</em></label>
 			<select class="form-control selectpicker" id="dia_pagamento" title="- Selecione -" name="dia_pagamento">
-				<option>01</option>
-				<option>02</option>
-				<option>03</option>
-				<option>04</option>
-				<option>05</option>
-				<option>06</option>
-				<option>07</option>
-				<option>08</option>
-				<option>09</option>
-				<option>10</option>
-				<option>11</option>
-				<option>12</option>
-				<option>13</option>
-				<option>14</option>
-				<option>15</option>
-				<option>16</option>
-				<option>17</option>
-				<option>18</option>
-				<option>19</option>
-				<option>20</option>
-				<option>21</option>
-				<option>22</option>
-				<option>23</option>
-				<option>24</option>
-				<option>25</option>
-				<option>26</option>
-				<option>27</option>
-				<option>28</option>
-				<option>29</option>
-				<option>30</option>
-				<option>31</option>
+				@for($i=1;$i<32;$i++)
+				<option value="{{$i}}" {{ $cliente->dia_pagamento == $i ? 'selected' : ''}}>
+					{{$i}}
+				</option>
+				@endfor
 			</select>
 		</div>
 		<div class="form-group">
 			<div class="checkbox ativar">
 				<label>
-					<input type="checkbox" name="ativo" value="1"> Ativo?
+					<input type="checkbox" name="ativo" value="1" {{ $cliente->ativo == 1 ? 'checked' : ''}}> Ativo?
 				</label>
 			</div>
 		</div>

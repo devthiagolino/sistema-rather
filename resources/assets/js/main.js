@@ -16,6 +16,13 @@ var APP = {
 		escolherTipoDeCliente.on('change', function()
 		{
 
+			var edicao = escolherTipoDeCliente.data('acao');
+
+			if(edicao)
+			{
+				mostrarAlert++;
+			}
+
 			var self = $(this);
 
 			if(mostrarAlert > 0)

@@ -16,12 +16,14 @@
 
 	<!-- === BUSCA === -->
 	<div class="busca input-group">
-		<input type="text" class="form-control" placeholder="Buscar por...">
-		<span class="input-group-btn">
-			<button class="btn btn-default" type="button">
-				<span class="icone-buscar" aria-hidden="true"></span>
-			</button>
-		</span>
+		<form action="{{ route('admin.clientes.index') }}">
+			<input type="text" class="form-control" placeholder="Buscar por..." name="nome" value="{{ request()->get('nome', null) }}">
+			<span class="input-group-btn">
+				<button class="btn btn-default" type="button">
+					<span class="icone-buscar" aria-hidden="true"></span>
+				</button>
+			</span>
+		</form>
 	</div>
 	<!-- fim BUSCA -->
 

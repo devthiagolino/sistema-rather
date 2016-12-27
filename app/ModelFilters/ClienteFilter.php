@@ -21,4 +21,12 @@ class ClienteFilter extends ModelFilter
     {
         return $this->where('clientes.ativo', $ativo);
     }
+
+    public function nome($nome)
+    {
+        return $this->leftJoin('clientes_pf', 'clientes.id', '=', 'clientes_pf.cliente_id')
+                    ->leftJoin('clientes_pj', 'clientes.id', '=', 'clientes_pj.cliente_id')
+                    ->whereRaw("(clientes_pf.nome like '%{$nome}%' OR clientes_pj.razao_social like '%{$nome}%')");
+    }
+
 }

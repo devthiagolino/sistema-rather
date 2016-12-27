@@ -11,17 +11,11 @@ Route::group(['prefix' => 'admin'], function()
 
 });
 
+Route::get('/login', 'AuthController@login')->name('web.auth.login');
+Route::get('/logout', 'AuthController@logout')->name('web.auth.logout');
+Route::post('/login', 'AuthController@authenticate')->name('web.auth.authenticate');
 
-Route::group(['prefix' => 'web'], function()
-{
-
-	Route::get('/login', 'AuthController@login')->name('web.auth.login');
-	Route::get('/logout', 'AuthController@logout')->name('web.auth.logout');
-	Route::post('/login', 'AuthController@authenticate')->name('web.auth.authenticate');
-
-});
-
-Route::group(['middleware' => 'auth:web', 'prefix' => '/web'], function()
+Route::group(['middleware' => 'auth:web'], function()
 {
 
 	Route::get('/', 'HomeController@home')->name('web.dashboard');

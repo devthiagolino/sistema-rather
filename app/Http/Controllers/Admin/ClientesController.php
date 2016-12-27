@@ -13,6 +13,7 @@ use App\Entities\ClientePJ;
 
 use JansenFelipe\Utils\Utils as Utils;
 use JansenFelipe\Utils\Mask as Mask;
+use Artesaos\Cidade;
 
 use Validator;
 
@@ -72,18 +73,24 @@ class ClientesController extends Controller
 		}
 
 		$clienteData = [
-		'plano_id' 			=> $request->get('plano'),
-		'vinculado_a' 		=> $request->get('vinculo_id', 0),
-		'email' 			=> $request->get('email'),
-		'telefone' 			=> Utils::unmask($request->get('telefone', null)),
-		'celular' 			=> Utils::unmask($request->get('celular')),
-		'observacoes' 		=> $request->get('observacoes', null),
-		'cep'				=> Utils::unmask($request->get('cep', null)),
-		'endereco' 			=> $request->get('endereco', null),
-		'end_numero' 		=> $request->get('numero', null),
-		'end_complemento' 	=> $request->get('end_complemento', null),
-		'bairro' 			=> $request->get('bairro', null),
-		'ativo' 			=> $request->get('ativo', 1)
+			'plano_id' 			=> $request->get('plano'),
+			'vinculado_a' 		=> $request->get('vinculo_id', 0),
+			'email' 			=> $request->get('email'),
+			'telefone' 			=> Utils::unmask($request->get('telefone', null)),
+			'celular' 			=> Utils::unmask($request->get('celular')),
+			'observacoes' 		=> $request->get('observacoes', null),
+			'cep'				=> Utils::unmask($request->get('cep', null)),
+			'endereco' 			=> $request->get('endereco', null),
+			'end_numero' 		=> $request->get('numero', null),
+			'end_complemento' 	=> $request->get('end_complemento', null),
+			'bairro' 			=> $request->get('bairro', null),
+			'ativo' 			=> $request->get('ativo', 1),
+			'cidade_id' 		=> $request->get('cidade_id'),
+
+			'hr_sala_reuniao' 			=> $request->get('hr_sala_reuniao'),
+			'hr_sala_treinamento' 		=> $request->get('hr_sala_treinamento'),
+			'impressoes_adicionais' 	=> $request->get('impressoes_adicionais'),
+			'dia_pagamento' 			=> $request->get('dia_pagamento'),
 		];
 
 		if($request->hasFile('foto'))
@@ -185,16 +192,161 @@ class ClientesController extends Controller
 			return abort(404);
 		}
 
-		$planos 	= Plano::getPlanosAtivos();
+		$planos 		= Plano::getPlanosAtivos();
 		$vinculosPF 	= Cliente::getVinculos();
 		$vinculosPJ 	= Cliente::getVinculos('pj');
+		
+		if($cliente->cidade_id)
+		{
+			$cliente->cidade 	= Cidade::find($cliente->cidade_id);
+		}
 
 		return view('admin.clientes.edit', compact('cliente', 'planos', 'vinculosPJ', 'vinculosPF'));
 	}
 
-	public function update($id)
+	public function update(Request $request, $id)
 	{
+
+		$cliente = $this->model->find($id);
+
+		if(!$cliente)
+		{
+			return response()->json(['erro' => 'Cliente não existe.'], 500);
+		}
+
+		$validator = Validator::make($request->all(), [
+			'tipo_cliente' => 'required'
+			]);
+
+		if($validator->fails()) 
+		{
+			return response()->json($validator->errors(), 422);
+		}
+
+		$validator = null;
+
+		$tipoDeCliente = $request->get('tipo_cliente');
+
+		if($tipoDeCliente == 'pf')
+		{
+			$validator = Validator::make($request->all(), Cliente::$rulesPF);
+		}else{
+			$validator = Validator::make($request->all(), Cliente::$rulesPJ);
+		}
+
+		if($validator->fails()) 
+		{
+			return response()->json($validator->errors(), 422);
+		}
+
+		$clienteData = [
+			'plano_id' 			=> $request->get('plano'),
+			'vinculado_a' 		=> $request->get('vinculo_id', 0),
+			'email' 			=> $request->get('email'),
+			'telefone' 			=> Utils::unmask($request->get('telefone', null)),
+			'celular' 			=> Utils::unmask($request->get('celular')),
+			'observacoes' 		=> $request->get('observacoes', null),
+			'cep'				=> Utils::unmask($request->get('cep', null)),
+			'endereco' 			=> $request->get('endereco', null),
+			'end_numero' 		=> $request->get('numero', null),
+			'end_complemento' 	=> $request->get('end_complemento', null),
+			'bairro' 			=> $request->get('bairro', null),
+			'ativo' 			=> $request->get('ativo', 0),
+			'cidade_id' 		=> $request->get('cidade_id'),
+
+			'hr_sala_reuniao' 			=> $request->get('hr_sala_reuniao'),
+			'hr_sala_treinamento' 		=> $request->get('hr_sala_treinamento'),
+			'impressoes_adicionais' 	=> $request->get('impressoes_adicionais'),
+			'dia_pagamento' 			=> $request->get('dia_pagamento'),
+		];
+
+		if($request->hasFile('foto'))
+		{
+			$clienteData['foto'] = $request->foto->extension();
+		}
 		
+		try{
+			
+			$cliente->update($clienteData);
+
+			if($request->hasFile('foto'))
+			{
+				$ext = $request->foto->extension();
+				$path = $request->file('foto')->move(public_path('clientes'), "{$cliente->id}_foto.{$ext}");
+			}
+
+		}catch(\Exception $e){
+
+			if(env('APP_DEBUG'))
+			{
+				return response()->json(['erro' => $e->getMessage()], 500);
+			}else{
+				return response()->json(['erro' => 'Não foi possível criar um novo cliente, por favor entrar em contato com o suporte. :)'], 500);
+			}
+
+		}
+
+		$tipoClienteData = [
+		'pf' => [
+			'nome' => $request->get('nome'),
+			'nome_apresentacao_nick' => $request->get('nome_apresentacao_nick', null),
+			'cpf' => Utils::unmask($request->get('cpf')),
+			'rg' => Utils::unmask($request->get('rg', null)),
+			'genero' => $request->get('genero')
+		],
+		'pj' => [
+			'razao_social' => $request->get('razao_social'),
+			'nome_fantasia' => $request->get('nome_fantasia'),
+			'ramo_atividade' => $request->get('ramo_atividade', null),
+			'cnpj' => Utils::unmask($request->get('cnpj')),
+			'atividades_iniciadas_em' => $request->get('atividades_iniciadas_em', \Carbon\Carbon::now()->format('Y-m-d')),
+			'nome_representante_legal' => $request->get('nome_representante_legal', null)
+			]
+		];
+		
+		if($request->has('data_nascimento'))
+		{
+			$dataNascimento = \Carbon\Carbon::createFromFormat('d/m/Y', $request->get('data_nascimento'));
+
+			if($dataNascimento)
+			{
+				$tipoClienteData[$tipoDeCliente]['data_nascimento'] = $dataNascimento->format('Y-m-d');
+			}
+		}
+
+		if(!isset($tipoClienteData[$tipoDeCliente]))
+		{
+			return response()->json([
+				'erro' => 'Alguma coisa não saiu como o esperado, por favor entrar em contato com o suporte. :)'
+				], 500);
+		}		
+
+		if($tipoDeCliente == 'pf')
+		{			
+			$tipoCliente = ClientePF::where('cliente_id', $cliente->id)->first();
+		}else{			
+			$tipoCliente = ClientePJ::where('cliente_id', $cliente->id)->first();			
+		}
+
+		try{
+			
+			$tipoCliente->update($tipoClienteData[$tipoDeCliente]);
+
+		}catch(\Exception $e){
+			
+			if(env('APP_DEBUG'))
+			{
+				return response()->json(['erro' => $e->getMessage()], 500);
+			}else{
+				return response()->json(['erro' => 'Não foi possível criar um novo cliente, por favor entrar em contato com o suporte. :)'], 500);
+			}	
+
+		}
+
+		return response()->json([
+			'redirect' => route('admin.clientes.index'), 
+			'sucesso' => 'Cliente cadastrado com sucesso.'
+			]);
 	}
 
 	public function destroy($id)

@@ -25,7 +25,8 @@ class Cliente extends AbstractModel
 		'data_nascimento' => 'required',
 		'cpf' 	=> 'required',
 		'genero' 	=> 'required|in:M,F,O',
-		'celular' => 'required'
+		'celular' => 'required',
+		'cidade_id' => 'required'
 	];
 
 	public static $rulesPJ = [
@@ -33,13 +34,15 @@ class Cliente extends AbstractModel
 		'nome_fantasia'	=> 'required',
 		'cnpj' 	=> 'required',
 		'email' => 'required|email',
-		'celular' => 'required'
+		'celular' => 'required',
+		'cidade_id' => 'required'
 	];
 
 	public $table = 'clientes';
 
 	public $fillable = [
 		'plano_id', 
+		'cidade_id',
 		'vinculado_a', 
 		'email', 
 		'telefone',
@@ -50,7 +53,11 @@ class Cliente extends AbstractModel
 		'end_numero', 
 		'end_complemento', 
 		'bairro', 
-		'ativo'
+		'ativo',
+		'hr_sala_reuniao',
+		'hr_sala_treinamento',
+		'impressoes_adicionais',
+		'dia_pagamento'
 	];
 
 	public function modelFilter()
